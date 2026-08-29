@@ -42,8 +42,17 @@ people's merged work*. So:
    far beyond what the intent could plausibly touch (a "add one field" branch showing
    300 changed files). If anything looks inflated, STOP — show the user the diffstat and
    commit list, explain the base looks wrong, and do not audit, let alone edit.
-4. Write down the intent in one or two sentences. It goes into every agent prompt —
-   it's how the agents tell essential changes from incidental ones.
+4. **Write a short change brief** — the shared context every agent receives. Draw it
+   from the conversation, the branch name, the commit messages
+   (`git log $BASE..HEAD`), and any linked PR/issue description, and capture:
+   - **Intent** — one or two sentences on what this branch is *for*.
+   - **In scope** — the files/areas the intent is expected to touch.
+   - **Out of scope** — anything the user said to leave alone, plus follow-ups
+     deliberately deferred to a later PR.
+
+   This brief is how the agents tell essential changes from incidental ones — the
+   richer it is, the fewer false reverts. If any part is genuinely unknown, say so in
+   the brief rather than guessing (an unknown intent makes every revert suspect).
 
 If the diff is empty, say so and stop.
 
@@ -59,8 +68,9 @@ committing and pushing to the user.
 ## Step 1 — Three audits in parallel (analysis only)
 
 Spawn all three agents **in a single message** so they run concurrently. They analyze
-only — no edits. Give every agent: the intent statement, the validated `$BASE`, and
-instructions to read the diff themselves (`git diff $BASE`) plus surrounding code for
+only — no edits. Give every agent: the **change brief** from Step 0 (intent + in-scope +
+out-of-scope), the validated `$BASE`, the commit list (`git log --oneline $BASE..HEAD`),
+and instructions to read the diff themselves (`git diff $BASE`) plus surrounding code for
 context.
 
 Every finding must record the **exact current text of the lines it targets** (file,
@@ -69,8 +79,19 @@ is only applied if its recorded lines still match the file at apply time.
 
 ### Agent 1 — Scope auditor (unnecessary file changes)
 
-Classify every changed file and hunk as **essential** (required for the intent) or
-**incidental**. Incidental changes to hunt for:
+Ground every judgment in the change brief. Use it as the yardstick:
+
+- **Essential** — the change traces to the stated intent, or is a direct, unavoidable
+  consequence of it (a call-site updated for a changed signature, an import the new code
+  needs, a type the new code forces).
+- **Incidental** — it has no line back to the intent. If a file is not on the brief's
+  **in-scope** list, treat its hunks as incidental until proven otherwise; if it matches
+  the **out-of-scope** list, it's incidental with high confidence.
+- **Unknown intent** — if the brief couldn't pin down the intent, do not propose reverts
+  on that basis; only flag changes that are incidental under *any* reasonable intent
+  (pure formatting, unrelated files) and say the rest is unassessable.
+
+Classify every changed file and hunk on that basis. Incidental changes to hunt for:
 
 - Drive-by refactors and renames in code the change didn't need to touch
 - Formatting/whitespace/import-reordering churn with no behavior change
