@@ -105,21 +105,34 @@ keep it — a false revert breaks the build; a kept extra line just costs review
 
 ### Agent 2 — Test auditor (test bloat)
 
-Review **only tests this branch added or modified** — tests that already exist on
-`$BASE` are strictly out of scope and must never be flagged for deletion (at most,
-this branch's *modifications* to them can be reverted by the scope auditor). Flag:
+The tests **under audit** are only those this branch added or modified. But to judge
+them, also **scan the pre-existing test files around them** (same test file, sibling
+files for the same module) — a new test can only be recognized as redundant, or as a
+consolidation candidate, by comparing it against what already exists on `$BASE`. Flag:
 
 - New tests that don't exercise the intended change (unrelated code, re-testing
   framework/library behavior, trivial getters/setters)
-- Duplicate tests — same code path, same assertion shape, different names
-- Clusters of near-identical tests that should collapse into one parameterized /
+- New tests whose coverage an **existing** test already provides — same code path,
+  same assertion shape, different names
+- Clusters of near-identical **new** tests that should collapse into one parameterized /
   table-driven test
+- A new test that repeats an existing test's setup/logic and adds one extra check —
+  e.g. an existing test verifies value A, the new test runs the same logic and verifies
+  B: consolidate by extending the existing test to assert A **and** B, and drop the new
+  one
 - Excessive edge-case padding far beyond what the change warrants
 
-Return `{file, test-name(s), verdict, action, target-lines}` where action is `delete`
-or `merge-into-one` (with the merged test sketched out). The goal is the smallest test
-set that still meaningfully covers the intended change — coverage of the actual change
-must never drop, only redundancy.
+Hard limits on touching pre-existing tests: they may only be **extended** (absorbing a
+new test's assertions into their existing setup) — never deleted, and never have any
+existing assertion weakened or removed. If a consolidation would require restructuring
+an existing test beyond adding assertions, don't propose it; keep the tests separate.
+
+Return `{file, test-name(s), verdict, action, target-lines}` where action is `delete`,
+`merge-into-one` (collapse new tests, with the merged test sketched out), or
+`merge-into-existing` (name the existing `$BASE` test, sketch the extended version, and
+record target-lines for **both** the new test to remove and the existing test to
+extend). The goal is the smallest test set that still meaningfully covers the intended
+change — coverage of the actual change must never drop, only redundancy.
 
 ### Agent 3 — Comment auditor (the 3-line law)
 
