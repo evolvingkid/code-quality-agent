@@ -1,11 +1,7 @@
 # Code Quality Check
 
-A Claude Code plugin that adds the **`/compress`** skill — it shrinks a bloated code diff
-down to the minimal, reviewable change. A PR should read as one idea; `/compress` audits
-your branch's diff for change scope, test bloat, and over-long comments, then trims it to
-the smallest change that still fully accomplishes the intent.
-
-This repository doubles as a **plugin marketplace**, so anyone can install it directly.
+A Claude Code plugin — and installable marketplace — providing focused code-quality
+skills. Each skill keeps its own docs in its folder, so this file stays a short index.
 
 ## Install
 
@@ -16,27 +12,11 @@ In an interactive Claude Code session, run:
 /plugin install code-quality-check@code-quality-agent
 ```
 
-## Usage
+## Skills
 
-Run it after a multi-file change — or right before committing / opening a PR:
-
-```
-/compress
-```
-
-What it does:
-
-1. **Establishes the true base** — fetches `origin` and diffs against the remote base
-   (never a stale local branch), then sanity-checks the diff before trusting it.
-2. **Runs three audits in parallel** — change scope (incidental file edits), test bloat
-   (redundant/unrelated tests), and comment length (the 3-line law).
-3. **Presents a compression plan** with a stable ID per finding and applies **nothing**
-   until you approve — everything, a subset, or nothing.
-4. **Applies approved fixes** behind a safety snapshot, then runs the test suite/build as
-   a hard gate and reports before/after plus how to roll back.
-
-The intended change is treated as sacred; only incidental churn is a candidate for
-removal.
+| Skill | Command | What it does | Docs |
+|-------|---------|--------------|------|
+| compress | `/compress` | Shrinks a bloated code diff down to the minimal, reviewable change via three parallel audits and an approved plan. | [skills/compress/README.md](skills/compress/README.md) |
 
 ## Local development
 
@@ -59,16 +39,19 @@ changes.
 │   └── plugin.json         # plugin manifest (metadata)
 ├── skills/
 │   └── compress/
-│       └── SKILL.md        # the /compress skill
-├── README.md
+│       ├── SKILL.md        # the /compress prompt Claude loads
+│       └── README.md       # human-facing docs for this skill
+├── README.md               # this index
 └── LICENSE
 ```
 
 ## Extending
 
-Add more skills by dropping additional `<name>/SKILL.md` directories in `skills/` — they're
-auto-discovered. To host more than one plugin from this marketplace, put each plugin in
-its own subfolder and add an entry to the `plugins` array in
+Each skill lives in its own `skills/<name>/` folder with two files: `SKILL.md` (the prompt
+Claude loads) and `README.md` (human docs). Add a new skill by creating that folder and
+adding one row to the **Skills** table above — the root README stays an index rather than
+growing without bound. To host more than one plugin from this marketplace, put each plugin
+in its own subfolder and add an entry to the `plugins` array in
 `.claude-plugin/marketplace.json` with `"source": "./that-folder"`.
 
 ## License
