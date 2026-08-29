@@ -112,6 +112,12 @@ consolidation candidate, by comparing it against what already exists on `$BASE`.
 
 - New tests that don't exercise the intended change (unrelated code, re-testing
   framework/library behavior, trivial getters/setters)
+- New tests for **obviously-correct trivial code** — logic so simple it can be verified
+  by reading it: a one-line arithmetic change (`total + fee`), a plain pass-through or
+  delegation, a constant/field rename. If the code has no branches, no error paths, and
+  no edge cases, a dedicated test adds maintenance cost without catching anything —
+  flag it for deletion. This only applies when the logic is genuinely trivial: any
+  conditional, loop, boundary, or failure mode means the test stays
 - New tests whose coverage an **existing** test already provides — same code path,
   same assertion shape, different names
 - Clusters of near-identical **new** tests that should collapse into one parameterized /
