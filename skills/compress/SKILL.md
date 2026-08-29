@@ -142,18 +142,30 @@ change — coverage of the actual change must never drop, only redundancy.
 
 ### Agent 3 — Comment auditor (the 3-line law)
 
-Scan every comment and doc comment in the diff and enforce:
+Operating principle: **good code needs few comments.** A function that adds two numbers
+and does only that is understood at a glance — it needs no comment at all. Comments are
+for what the code *can't* say (why, constraints, gotchas), never for narrating what it
+does. Scan every comment and doc comment in the diff and enforce:
 
+- **Inline comments inside function/method bodies are banned.** Both trailing
+  (`x = y + fee  // add the fee`) and standalone lines between statements. An inline
+  comment is a signal, not documentation: either the code is unclear (the real fix —
+  but out of this agent's scope, note it as a suggestion), or the function does
+  something its doc doesn't cover. The fix is always the same — **move the information
+  into the function's doc comment** (or the file-top comment if it's file-level
+  context) and delete the inline comment. This applies even when the branch only added
+  an inline comment to a **pre-existing** function: update that function's existing doc
+  comment to absorb it. The doc-comment edit counts toward the 3-line law below.
 - **No comment or doc comment may exceed 3 lines.** This is a strict law. Longer
   comments get rewritten — compress with bullet points or arrows (`->`) to preserve the
   full meaning in fewer lines. Never drop information a future reader needs; compress
   the phrasing, not the content.
-- **No inline comments** (trailing a line of code). Move the content above the function,
-  or into the file-top comment, whichever fits.
-- Delete comments that merely restate the code (`// increment i`).
+- Delete comments that merely restate the code (`// increment i`) — restating adds
+  nothing above the code itself; this is deletion, not relocation.
 
 Return `{file, line, original-comment, rewritten-comment, target-lines}` — the rewrite
-ready to paste, already ≤3 lines and positioned above the function or file.
+ready to paste, already ≤3 lines and positioned in the doc comment or file-top comment
+(never inside a function body).
 
 ## Step 2 — Present the compression plan and get approval
 
