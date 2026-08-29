@@ -1,0 +1,10 @@
+{
+  "name": "code-quality-check",
+  "displayName": "Code Quality Check",
+  "version": "0.1.0",
+  "description": "Reviews your current code changes for quality issues — naming, complexity, duplication, dead code, error handling, and test coverage.",
+  "author": { "name": "evolvingkid", "url": "https://github.com/evolvingkid" },
+  "repository": "https://github.com/evolvingkid/code-quality-agent",
+  "license": "MIT",
+  "keywords": ["code-quality", "review"]
+}

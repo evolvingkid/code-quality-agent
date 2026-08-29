@@ -1,0 +1,19 @@
+{
+  "name": "code-quality-agent",
+  "owner": {
+    "name": "evolvingkid",
+    "url": "https://github.com/evolvingkid"
+  },
+  "description": "Marketplace for code-quality tooling plugins.",
+  "plugins": [
+    {
+      "name": "code-quality-check",
+      "source": "./",
+      "description": "Adds /code-quality-check — reviews your current code changes for quality issues.",
+      "version": "0.1.0",
+      "author": { "name": "evolvingkid" },
+      "keywords": ["code-quality", "review", "linting"],
+      "category": "productivity"
+    }
+  ]
+}
