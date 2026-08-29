@@ -1,10 +1,10 @@
 {
   "name": "code-quality-check",
-  "displayName": "Code Quality Check",
+  "displayName": "Compress",
   "version": "0.1.0",
-  "description": "Reviews your current code changes for quality issues — naming, complexity, duplication, dead code, error handling, and test coverage.",
+  "description": "Shrinks a bloated code diff down to the minimal, reviewable change — audits change scope, test bloat, and comment length, then applies an approved compression plan.",
   "author": { "name": "evolvingkid", "url": "https://github.com/evolvingkid" },
   "repository": "https://github.com/evolvingkid/code-quality-agent",
   "license": "MIT",
-  "keywords": ["code-quality", "review"]
+  "keywords": ["diff", "compress", "pr", "cleanup", "review"]
 }

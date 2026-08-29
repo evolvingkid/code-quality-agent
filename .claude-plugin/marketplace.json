@@ -9,10 +9,10 @@
     {
       "name": "code-quality-check",
       "source": "./",
-      "description": "Adds /code-quality-check — reviews your current code changes for quality issues.",
+      "description": "Adds /compress — shrinks a bloated code diff down to the minimal, reviewable change via three parallel audits and an approved compression plan.",
       "version": "0.1.0",
       "author": { "name": "evolvingkid" },
-      "keywords": ["code-quality", "review", "linting"],
+      "keywords": ["diff", "compress", "pr", "cleanup", "review"],
       "category": "productivity"
     }
   ]
