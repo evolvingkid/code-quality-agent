@@ -2,8 +2,8 @@
 
 A Claude Code plugin that adds the **`/compress`** skill — it shrinks a bloated code diff
 down to the minimal, reviewable change. A PR should read as one idea; `/compress` audits
-your branch's diff for change scope, test bloat, and over-long comments, then trims it to
-the smallest change that still fully accomplishes the intent.
+your branch's diff for change scope, test bloat, over-long comments, and code quality,
+then trims it to the smallest change that still fully accomplishes the intent.
 
 This repository doubles as a **plugin marketplace**, so anyone can install it directly.
 
@@ -30,8 +30,10 @@ What it does:
    (never a stale local branch), then sanity-checks the diff before trusting it.
 2. **Builds a change brief** — intent, what's in scope, and what's explicitly out of
    scope — and shares it with every audit agent.
-3. **Runs three audits in parallel** — change scope (incidental file edits), test bloat
-   (redundant/unrelated tests), and comment length (the 3-line law).
+3. **Runs four audits in parallel** — change scope (incidental file edits), test bloat
+   (redundant/unrelated tests), comment length (the 3-line law), and code quality
+   (single-responsibility functions, shallow call depth, readable logic, no ref guards
+   masking non-idempotent React effects).
 4. **Presents a compression plan** with a stable ID per finding and applies **nothing**
    until you approve — everything, a subset, or nothing.
 5. **Applies approved fixes** behind a safety snapshot, then runs the test suite/build as

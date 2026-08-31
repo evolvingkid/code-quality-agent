@@ -1,13 +1,13 @@
 ---
 name: compress
-description: Shrink a bloated code diff down to the minimal, reviewable change. Use this skill whenever the user runs /compress, asks to "clean up", "slim down", "shrink", or "minimize" a diff or PR, complains that Claude changed too many files, wrote too many tests, or left long comments — and also proactively after finishing any multi-file code change, right before committing or opening a PR. Runs three parallel audits (change scope, test bloat, comment length) on the branch's diff against the fetched remote base, then presents a compression plan for approval before touching anything.
+description: Shrink a bloated code diff down to the minimal, reviewable change. Use this skill whenever the user runs /compress, asks to "clean up", "slim down", "shrink", or "minimize" a diff or PR, complains that Claude changed too many files, wrote too many tests, or left long comments — and also proactively after finishing any multi-file code change, right before committing or opening a PR. Runs four parallel audits (change scope, test bloat, comment length, code quality) on the branch's diff against the fetched remote base, then presents a compression plan for approval before touching anything.
 ---
 
 # Compress
 
 A PR should read as one idea. Every extra file touched, every redundant test, every
 five-line comment dilutes that idea and costs reviewer attention. This skill audits the
-current branch's diff with three parallel agents, presents a compression plan, and — only
+current branch's diff with four parallel agents, presents a compression plan, and — only
 after the user approves — trims the diff down to the smallest change that still fully
 accomplishes the intent.
 
@@ -65,9 +65,9 @@ which re-triggers CI and invalidates any in-flight review comments. That cost is
 user's to weigh, not the skill's. Never amend or force-push published commits; leave all
 committing and pushing to the user.
 
-## Step 1 — Three audits in parallel (analysis only)
+## Step 1 — Four audits in parallel (analysis only)
 
-Spawn all three agents **in a single message** so they run concurrently. They analyze
+Spawn all four agents **in a single message** so they run concurrently. They analyze
 only — no edits. Give every agent: the **change brief** from Step 0 (intent + in-scope +
 out-of-scope), the validated `$BASE`, the commit list (`git log --oneline $BASE..HEAD`),
 and instructions to read the diff themselves (`git diff $BASE`) plus surrounding code for
@@ -167,6 +167,39 @@ Return `{file, line, original-comment, rewritten-comment, target-lines}` — the
 ready to paste, already ≤3 lines and positioned in the doc comment or file-top comment
 (never inside a function body).
 
+### Agent 4 — Quality auditor (readability & consistency)
+
+Review **only code this branch added or modified** — pre-existing code is out of scope
+unless the branch touched it. The bar: a human reading the diff top-to-bottom should
+understand it in one pass. Flag:
+
+- **Inconsistent logic** — the same kind of problem solved two different ways in the
+  diff, or a pattern that clashes with how the surrounding codebase already does it.
+  Consistency beats local cleverness.
+- **Functions doing more than one thing.** A function should do a single thing; if
+  describing it honestly requires "and", it's a candidate to split — or to trim back to
+  its one job.
+- **Deep function-to-function nesting.** Long call chains where each function is just a
+  thin hop to the next force the reader to hold the whole tower in their head. Flatten:
+  inline trivial hops, keep the call depth shallow enough to trace at a glance.
+- **Hard-to-read constructs** — dense one-liners, clever tricks, deeply nested
+  conditionals, unclear names. Prefer the boring, obvious version.
+- **React: ref guards suppressing dev-mode double-invocation in `useEffect`.** In dev
+  (StrictMode) effects run twice by design — that's a lint for broken effects, not a
+  bug to silence. A `useRef` "already ran" check hides the real problem: the effect
+  isn't idempotent or lacks a proper cleanup. Flag any such guard; the fix is to
+  restructure the effect (idempotent logic, correct cleanup, right dependencies) so
+  double-invocation is harmless. A ref guard is the last resort, acceptable only with
+  a comment justifying why no other structure works.
+
+Constraint: this skill exists to shrink diffs, so every proposed fix must keep the diff
+small — sketch the **minimal** rewrite, never an expansive refactor. If the right fix
+is genuinely large (an architectural problem), report it as an observation for a
+follow-up PR instead of a fix item.
+
+Return `{file, function-or-hunk, issue, suggested-fix, target-lines}` — the fix concrete
+enough to apply directly, with the exact current lines recorded for the staleness check.
+
 ## Step 2 — Present the compression plan and get approval
 
 Assemble every finding into one plan, grouped by auditor, each item with its one-line
@@ -182,6 +215,8 @@ Tests   T1. merge 4 near-identical priority tests -> 1 parameterized
         T2. delete 'listTasks returns priorities' — duplicates existing coverage
 Comments C1. tasks.js:12 compress 7-line block -> 2 lines
          C2. cli.py:8 move inline comment above function
+Quality  Q1. useTasks.ts:24 ref guard hides non-idempotent effect -> restructure cleanup
+         Q2. api.ts split fetchAndRenderAndCache into its single jobs
 ```
 
 Ask the user what to apply: everything, a subset (by ID), or nothing. **Do not edit
@@ -197,8 +232,10 @@ that waits is worth more than an unapproved edit.
    git stash store -m "pre-compress snapshot" "$(git stash create)"       # uncommitted state, keeps tree intact
    ```
    (Skip the stash line if `git stash create` outputs nothing — clean tree.)
-2. Apply approved items in order: **scope reverts -> test fixes -> comment rewrites**.
-   Scope first means later steps don't waste work on code that's about to disappear.
+2. Apply approved items in order: **scope reverts -> quality fixes -> test fixes ->
+   comment rewrites**. Scope first means later steps don't waste work on code that's
+   about to disappear; quality fixes before tests so tests are adjusted against the
+   final shape of the code.
 3. **Staleness check on every item**: before applying, re-read the file and compare
    against the finding's recorded target lines. If they no longer match (an earlier
    revert removed or shifted them), skip the item and note it in the report — never
