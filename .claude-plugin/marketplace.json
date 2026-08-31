@@ -9,7 +9,7 @@
     {
       "name": "code-quality-check",
       "source": "./",
-      "description": "Adds /compress — shrinks a bloated code diff down to the minimal, reviewable change via four parallel audits and an approved compression plan.",
+      "description": "Adds /check-quality — shrinks a bloated code diff down to the minimal, reviewable change via four parallel audits and an approved compression plan.",
       "version": "0.1.0",
       "author": { "name": "evolvingkid" },
       "keywords": ["diff", "compress", "pr", "cleanup", "review"],

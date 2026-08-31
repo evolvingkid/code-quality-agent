@@ -1,6 +1,6 @@
 {
   "name": "code-quality-check",
-  "displayName": "Compress",
+  "displayName": "Check Quality",
   "version": "0.1.0",
   "description": "Shrinks a bloated code diff down to the minimal, reviewable change — audits change scope, test bloat, comment length, and code quality, then applies an approved compression plan.",
   "author": { "name": "evolvingkid", "url": "https://github.com/evolvingkid" },

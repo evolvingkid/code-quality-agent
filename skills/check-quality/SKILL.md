@@ -1,9 +1,9 @@
 ---
-name: compress
-description: Shrink a bloated code diff down to the minimal, reviewable change. Use this skill whenever the user runs /compress, asks to "clean up", "slim down", "shrink", or "minimize" a diff or PR, complains that Claude changed too many files, wrote too many tests, or left long comments — and also proactively after finishing any multi-file code change, right before committing or opening a PR. Runs four parallel audits (change scope, test bloat, comment length, code quality) on the branch's diff against the fetched remote base, then presents a compression plan for approval before touching anything.
+name: check-quality
+description: Shrink a bloated code diff down to the minimal, reviewable change. Use this skill whenever the user runs /check-quality, asks to "clean up", "slim down", "shrink", or "minimize" a diff or PR, complains that Claude changed too many files, wrote too many tests, or left long comments — and also proactively after finishing any multi-file code change, right before committing or opening a PR. Runs four parallel audits (change scope, test bloat, comment length, code quality) on the branch's diff against the fetched remote base, then presents a compression plan for approval before touching anything.
 ---
 
-# Compress
+# Check Quality
 
 A PR should read as one idea. Every extra file touched, every redundant test, every
 five-line comment dilutes that idea and costs reviewer attention. This skill audits the

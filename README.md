@@ -1,7 +1,8 @@
 # Code Quality Check
 
-A Claude Code plugin that adds the **`/compress`** skill — it shrinks a bloated code diff
-down to the minimal, reviewable change. A PR should read as one idea; `/compress` audits
+A Claude Code plugin that adds the **`/check-quality`** skill — it shrinks a bloated code
+diff down to the minimal, reviewable change. A PR should read as one idea; `/check-quality`
+audits
 your branch's diff for change scope, test bloat, over-long comments, and code quality,
 then trims it to the smallest change that still fully accomplishes the intent.
 
@@ -21,7 +22,7 @@ In an interactive Claude Code session, run:
 Run it after a multi-file change — or right before committing / opening a PR:
 
 ```
-/compress
+/check-quality
 ```
 
 What it does:
@@ -62,8 +63,8 @@ changes.
 │   ├── marketplace.json    # marketplace manifest (lists installable plugins)
 │   └── plugin.json         # plugin manifest (metadata)
 ├── skills/
-│   └── compress/
-│       └── SKILL.md        # the /compress skill
+│   └── check-quality/
+│       └── SKILL.md        # the /check-quality skill
 ├── README.md               # this file — the single source of docs
 └── LICENSE
 ```
