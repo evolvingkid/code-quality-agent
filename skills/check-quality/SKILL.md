@@ -170,7 +170,21 @@ ready to paste, already ≤3 lines and positioned in the doc comment or file-top
 ### Agent 4 — Quality auditor (readability & consistency)
 
 Review **only code this branch added or modified** — pre-existing code is out of scope
-unless the branch touched it. The bar: a human reading the diff top-to-bottom should
+unless the branch touched it.
+
+**Start from first principles.** Using the change brief, ask what the change actually
+needs to achieve, then interrogate what was built:
+
+1. Is anything unnecessary, overly complicated, or resting on a weak assumption?
+   Challenge it: name the assumption and say why it doesn't hold.
+2. What can be **deleted** entirely?
+3. What can be **simplified** once those pieces are gone?
+
+When choosing a fix, prefer **deleting over simplifying, simplifying over optimizing,
+and optimizing over automating**. If the code already holds up, report nothing. A
+clean audit is a valid result, so never invent findings to look thorough.
+
+Then hold the remaining code to this bar: a human reading the diff top-to-bottom should
 understand it in one pass. Flag:
 
 - **Inconsistent logic** — the same kind of problem solved two different ways in the
@@ -202,8 +216,11 @@ enough to apply directly, with the exact current lines recorded for the stalenes
 
 ## Step 2 — Present the compression plan and get approval
 
-Assemble every finding into one plan, grouped by auditor, each item with its one-line
-reason and a stable ID:
+If no auditor found anything, say the diff is already minimal and stop. Leaving good
+code alone is the right outcome, not a failed run.
+
+Otherwise, assemble every finding into one plan, grouped by auditor, each item with its
+one-line reason and a stable ID:
 
 ```
 ## Compression plan (nothing applied yet)
