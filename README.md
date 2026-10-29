@@ -33,7 +33,8 @@ What it does:
    scope — and shares it with every audit agent.
 3. **Runs four audits in parallel** — change scope (incidental file edits), test bloat
    (redundant/unrelated tests), comment length (the 3-line law), and code quality
-   (single-responsibility functions, shallow call depth, readable logic, no ref guards
+   (a first-principles pass that prefers deleting over simplifying, then
+   single-responsibility functions, shallow call depth, readable logic, no ref guards
    masking non-idempotent React effects).
 4. **Presents a compression plan** with a stable ID per finding and applies **nothing**
    until you approve — everything, a subset, or nothing.
